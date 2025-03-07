@@ -24,10 +24,14 @@ public class Monster : MonoBehaviour
     {
         if (collision.collider.CompareTag("Truck"))
         {
-            Debug.Log("truck");
-
             StopCoroutine(Move);
+            animator.SetBool("IsAttacking", true);
         }
+    }
+
+    public void OnAttack()
+    {
+        Debug.Log("АјАн");
     }
 
     IEnumerator MonsterMove()
