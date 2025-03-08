@@ -14,7 +14,6 @@ public class Monster : MonoBehaviour
     float direction = 1f;
     
     float jumpForce = 5f;
-    int curLayer = 0;
 
     private void Awake()
     {
@@ -49,13 +48,11 @@ public class Monster : MonoBehaviour
                 isAttacking = true;
                 animator.SetBool("IsAttacking", true);
 
-                curLayer = 0;
-                MonsterManager.GetInstance().AddMonster(curLayer, this.gameObject);
+                MonsterManager.GetInstance().AddMonster(0, this);
             }
         }
         else
         {
-            // 0이 아닌 레이어에서 일어나는 일일 것
             if (collision.collider.CompareTag("Truck"))
             {
                 if (isMoving)
@@ -65,12 +62,13 @@ public class Monster : MonoBehaviour
 
                 animator.SetBool("IsAttacking", true);
             }
-            else if (collision.collider.CompareTag("Zombie") && Mathf.Abs(transform.position.y - collision.transform.position.y) < 0.5f)
+            else if (collision.collider.CompareTag("Zombie") && Mathf.Abs(transform.position.y - collision.transform.position.y) < 0.3f)
             {
                 if (isMoving)
                 {
                     isMoving = false;
                 }
+
                 animator.SetBool("IsAttacking", true);
             }
         }
@@ -79,40 +77,38 @@ public class Monster : MonoBehaviour
     public void OnAttack()
     {
         // 꾸준히 데미지는 줌
-
-        if (direction > 0f && MonsterManager.GetInstance().IsLastMonster(curLayer, this.gameObject))
-        {
-            rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
-            
-            MonsterManager.GetInstance().MoveMonsterToUpperLayer(curLayer, curLayer + 1, this.gameObject);
-            curLayer++;
-
-            animator.SetBool("IsAttacking", false);
-            isMoving = true;
-        }
-        else if (curLayer > 0 && MonsterManager.GetInstance().IsFirstMonster(curLayer, this.gameObject))
-        {
-            // 밑의 층의 몬스터들 오른쪽으로 살짝 밈
-
-            MonsterManager.GetInstance().MoveMonsters(curLayer - 1);
-            MonsterManager.GetInstance().MoveMonsterToLowerLayer(curLayer, curLayer - 1, this.gameObject);
-            curLayer--;
-
-        }
     }
 
-    public void MoveRightDirection()
+    public void Jump()
     {
-        StartCoroutine(MoveRight());
+        rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
+
+        isMoving = true;
+
     }
 
-    IEnumerator MoveRight()
+    public void MoveRightDirection(float _speed)
     {
-        direction = -1f;
+        StartCoroutine(MoveRight(_speed));
+    }
 
-        yield return new WaitForSeconds(0.3f);
+    IEnumerator MoveRight(float _speed)
+    {
 
-        direction = 1f;
+        direction = -1f * _speed;
+        animator.SetBool("IsAttacking", false);
+
+        yield return new WaitForSeconds(0.6f);
+
+        direction = 1f * _speed;
+        animator.SetBool("IsAttacking", true);
+
+        yield return null;
+    }
+
+    public bool GetIsMoving()
+    {
+        return isMoving;
     }
 
 }

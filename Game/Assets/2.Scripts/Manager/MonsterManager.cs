@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MonsterManager : MonoBehaviour
@@ -8,7 +9,7 @@ public class MonsterManager : MonoBehaviour
     private static MonsterManager instance;
     public static MonsterManager GetInstance() => instance;
 
-    List<List<GameObject>> monsters= new List<List<GameObject>>();
+    [SerializeField] List<List<Monster>> monsters= new List<List<Monster>>();
 
     private void Awake()
     {
@@ -16,46 +17,67 @@ public class MonsterManager : MonoBehaviour
         {
             instance = this;
         }
-        monsters.Add(new List<GameObject>());
+        monsters.Add(new List<Monster>());
     }
 
-    public void AddMonster(int _layer, GameObject _monster)
+    private void Start()
+    {
+        StartCoroutine(ManageMonster());
+    }
+
+    IEnumerator ManageMonster()
+    {
+        while (true)
+        {
+            for(int i = 1; i < monsters.Count; i++)
+            {
+                if (monsters[i].Count > 0 && !monsters[i][0].GetIsMoving())
+                {
+                    MoveMonsters(i - 1);
+
+                    Monster _monster = monsters[i][0];
+                    monsters[i].Remove(_monster);
+                    monsters[i - 1].Insert(0, _monster);
+                }
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    IEnumerator JumpMonster(int _layer, Monster _monster)
+    {
+        _monster.Jump();
+
+        yield return new WaitForSeconds(0.3f);
+
+        if ( monsters.Count - 1 < (_layer + 1) )
+        {
+            monsters.Add(new List<Monster>());
+        }
+
+        monsters[_layer].Remove(_monster);
+        AddMonster(_layer + 1, _monster);
+        //monsters[_layer + 1].Add(_monster);
+
+        yield return new WaitForSeconds(0.3f);
+    }
+
+    public void AddMonster(int _layer, Monster _monster)
     {
         monsters[_layer].Add(_monster);
-    }
 
-    public bool IsLastMonster(int _layer, GameObject _monster)
-    {
-        return monsters[_layer].Count - 1 == monsters[_layer].IndexOf(_monster) && monsters[_layer].Count != 1;
-    }
-
-    public bool IsFirstMonster(int _layer, GameObject _monster)
-    {
-        return monsters[_layer].IndexOf(_monster) == 0;
-    }
-
-    public void MoveMonsterToUpperLayer(int _prevLayer, int _nextLayer, GameObject _monster)
-    {
-        if ( monsters.Count - 1 < _nextLayer )
+        if (monsters[_layer].Count > 2)
         {
-            monsters.Add(new List<GameObject>());
+            Debug.Log("점프할래? " + _layer);
+            StartCoroutine(JumpMonster(_layer, _monster));
         }
-        monsters[_prevLayer].Remove(_monster);
-        monsters[_nextLayer].Add(_monster);
     }
-
-    public void MoveMonsterToLowerLayer(int _curLayer, int _prevLayer, GameObject _monster)
-    {
-        monsters[_curLayer].Remove(_monster);
-        monsters[_prevLayer].Insert(0, _monster);
-    }
-
 
     public void MoveMonsters(int _layer)
     {
-        foreach(GameObject _monster in monsters[_layer])
+        foreach(Monster _monster in monsters[_layer])
         {
-            _monster.GetComponent<Monster>().MoveRightDirection();
+            _monster.MoveRightDirection(monsters.Count - _layer);
         }
     }
 }
