@@ -29,7 +29,12 @@ public class MonsterManager : MonoBehaviour
         return monsters[_layer].Count - 1 == monsters[_layer].IndexOf(_monster) && monsters[_layer].Count != 1;
     }
 
-    public void MoveMonsterToNextLayer(int _prevLayer, int _nextLayer, GameObject _monster)
+    public bool IsFirstMonster(int _layer, GameObject _monster)
+    {
+        return monsters[_layer].IndexOf(_monster) == 0;
+    }
+
+    public void MoveMonsterToUpperLayer(int _prevLayer, int _nextLayer, GameObject _monster)
     {
         if ( monsters.Count - 1 < _nextLayer )
         {
@@ -39,16 +44,12 @@ public class MonsterManager : MonoBehaviour
         monsters[_nextLayer].Add(_monster);
     }
 
-    public void MoveMonsterToPrevLayer(int _curLayer, int _prevLayer, GameObject _monster)
+    public void MoveMonsterToLowerLayer(int _curLayer, int _prevLayer, GameObject _monster)
     {
         monsters[_curLayer].Remove(_monster);
         monsters[_prevLayer].Insert(0, _monster);
     }
 
-    public bool IsFirstMonster(int _layer, GameObject _monster)
-    {
-        return monsters[_layer].IndexOf(_monster) == 0;
-    }
 
     public void MoveMonsters(int _layer)
     {

@@ -11,20 +11,23 @@ public class Monster : MonoBehaviour
     bool isAttacking = false;
     bool isMoving = true;
     float speed = 2f;
+    float direction = 1f;
     
     float jumpForce = 5f;
     int curLayer = 0;
-
-    Coroutine Move;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rigidBody = GetComponent<Rigidbody2D>();
     }
-    private void Start()
+
+    private void Update()
     {
-        Move = StartCoroutine(MonsterMove());
+        if (isMoving)
+        {
+            transform.position += direction * Vector3.left * speed * Time.deltaTime;
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -34,14 +37,13 @@ public class Monster : MonoBehaviour
             isMoving = true;
         }
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if ( !isAttacking )
         {
             if (collision.collider.CompareTag("Zombie") || collision.collider.CompareTag("Truck"))
             {
-                //StopCoroutine(Move);
-                //Move = null;
                 isMoving = false;
 
                 isAttacking = true;
@@ -58,8 +60,6 @@ public class Monster : MonoBehaviour
             {
                 if (isMoving)
                 {
-                    //StopCoroutine(Move);
-                    //Move = null;
                     isMoving = false;
                 }
 
@@ -69,59 +69,50 @@ public class Monster : MonoBehaviour
             {
                 if (isMoving)
                 {
-                    //StopCoroutine(Move);
-                    //Move = null;
                     isMoving = false;
                 }
-
-                // animator.SetBool("IsAttacking", true);
+                animator.SetBool("IsAttacking", true);
             }
         }
     }
 
     public void OnAttack()
     {
-        if (MonsterManager.GetInstance().IsLastMonster(curLayer, this.gameObject))
+        // ²ÙÁØÈ÷ µ¥¹ÌÁö´Â ÁÜ
+
+        if (direction > 0f && MonsterManager.GetInstance().IsLastMonster(curLayer, this.gameObject))
         {
             rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
             
-            MonsterManager.GetInstance().MoveMonsterToNextLayer(curLayer, curLayer + 1, this.gameObject);
+            MonsterManager.GetInstance().MoveMonsterToUpperLayer(curLayer, curLayer + 1, this.gameObject);
             curLayer++;
-            
-            if ( !isMoving )
-            {
-                animator.SetBool("IsAttacking", false);
-                //Move = StartCoroutine(MonsterMove());
-                isMoving = true;
-            }
+
+            animator.SetBool("IsAttacking", false);
+            isMoving = true;
         }
         else if (curLayer > 0 && MonsterManager.GetInstance().IsFirstMonster(curLayer, this.gameObject))
         {
             // ¹ØÀÇ ÃþÀÇ ¸ó½ºÅÍµé ¿À¸¥ÂÊÀ¸·Î »ìÂ¦ ¹Ò
 
             MonsterManager.GetInstance().MoveMonsters(curLayer - 1);
-            MonsterManager.GetInstance().MoveMonsterToPrevLayer(curLayer, curLayer - 1, this.gameObject);
+            MonsterManager.GetInstance().MoveMonsterToLowerLayer(curLayer, curLayer - 1, this.gameObject);
             curLayer--;
 
         }
     }
 
-    IEnumerator MonsterMove()
-    {
-        while(true)
-        {
-            if (isMoving)
-            {
-                transform.position += Vector3.left * speed * Time.deltaTime;
-            }
-            
-            yield return null;
-        }
-    }
-
     public void MoveRightDirection()
     {
-        transform.position += Vector3.right;
+        StartCoroutine(MoveRight());
+    }
+
+    IEnumerator MoveRight()
+    {
+        direction = -1f;
+
+        yield return new WaitForSeconds(0.3f);
+
+        direction = 1f;
     }
 
 }

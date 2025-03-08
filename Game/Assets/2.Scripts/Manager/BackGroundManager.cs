@@ -5,7 +5,7 @@ public class BackGroundManager : MonoBehaviour
     private static BackGroundManager instance;
     public static BackGroundManager GetInstance() => instance;
 
-    [SerializeField] float speed = 2f;
+    [SerializeField] float speed = 1f;
 
     private float width;
     private Vector3 startPosition;
