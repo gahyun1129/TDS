@@ -6,14 +6,20 @@ using UnityEngine;
 public class Monster : MonoBehaviour
 {
     Animator animator;
+    Rigidbody2D rigidBody;
+
+    bool isAttacking = false;
+    float speed = 5f;
+    
+    float jumpForce = 5f;
+
 
     Coroutine Move;
-
-    float speed = 5f;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        rigidBody = GetComponent<Rigidbody2D>();
     }
     private void Start()
     {
@@ -22,16 +28,25 @@ public class Monster : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Truck"))
+        if ( !isAttacking )
         {
-            StopCoroutine(Move);
-            animator.SetBool("IsAttacking", true);
+            if (collision.collider.CompareTag("Zombie") || collision.collider.CompareTag("Truck"))
+            {
+                StopCoroutine(Move);
+                isAttacking = true;
+                animator.SetBool("IsAttacking", true);
+
+                MonsterManager.GetInstance().AddMonster(this.gameObject);
+            }
         }
     }
 
     public void OnAttack()
     {
-        Debug.Log("АјАн");
+        if (MonsterManager.GetInstance().IsLastMonster(this.gameObject))
+        {
+            rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
+        }
     }
 
     IEnumerator MonsterMove()
