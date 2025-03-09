@@ -11,10 +11,15 @@ public class Monster : MonoBehaviour
 
     bool isAttacking = false;
     bool isMoving = true;
+    bool isJumping = false;
+
     float speed = 2f;
-    float direction = 1f;
-    
     float jumpForce = 5f;
+
+    float xDirection = 1f;
+
+    int curLayer = 0;
+    float floorOffset = -3.2f;
 
     [SerializeField] Slider slider;
     int HP = 100;
@@ -29,66 +34,75 @@ public class Monster : MonoBehaviour
     {
         if (isMoving)
         {
-            transform.position += direction * Vector3.left * speed * Time.deltaTime;
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if ( collision.collider.CompareTag("Truck") || collision.collider.CompareTag("Zombie"))
-        {
-            isMoving = true;
+            transform.position += xDirection * Vector3.left * speed * Time.deltaTime;
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if ( !isAttacking )
+
+        if (collision.collider.CompareTag("Truck") )
         {
-            if (collision.collider.CompareTag("Zombie") || collision.collider.CompareTag("Truck"))
+            isMoving = false;
+            animator.SetBool("IsAttacking", true);
+
+            if (!isAttacking)
             {
-                isMoving = false;
-
                 isAttacking = true;
-                animator.SetBool("IsAttacking", true);
-
-                MonsterManager.GetInstance().AddMonster(0, this);
+                MonsterManager.GetInstance().AddMonster(curLayer, this);
             }
         }
-        else
+        else if (collision.collider.CompareTag("Zombie") && Mathf.Abs(transform.position.y - collision.transform.position.y) < 0.3f)
         {
-            if (collision.collider.CompareTag("Truck"))
-            {
-                if (isMoving)
-                {
-                    isMoving = false;
-                }
+            isMoving = false;
+            animator.SetBool("IsAttacking", true);
 
-                animator.SetBool("IsAttacking", true);
-            }
-            else if (collision.collider.CompareTag("Zombie") && Mathf.Abs(transform.position.y - collision.transform.position.y) < 0.3f)
+            if (!isAttacking)
             {
-                if (isMoving)
-                {
-                    isMoving = false;
-                }
-
-                animator.SetBool("IsAttacking", true);
+                isAttacking = true;
+                MonsterManager.GetInstance().AddMonster(curLayer, this);
             }
         }
     }
 
     public void OnAttack()
     {
-        // Damage To Truck
+        if ( xDirection > 0f)
+        {
+            if (curLayer < 1 && MonsterManager.GetInstance().AmILastMonsterInLayer(curLayer, this))
+            {
+                animator.SetBool("IsAttacking", false);
+                isMoving = true;
+
+                MonsterManager.GetInstance().RemoveMonster(curLayer, this);
+                StartCoroutine(Jumping());
+            }
+            else if ( MonsterManager.GetInstance().AmIFirstMonsterInLayer(curLayer, this))
+            {
+                MonsterManager.GetInstance().ManageMonster(curLayer);
+                curLayer--;
+            }
+        }
     }
 
-    public void Jump()
+    IEnumerator Jumping()
     {
         rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
+        curLayer++;
 
-        isMoving = true;
-
+        while (true)
+        {
+            if ( transform.position.y >= floorOffset + curLayer * 0.8f)
+            {
+                MonsterManager.GetInstance().AddMonster(curLayer, this);
+                break;
+            }
+            yield return null;
+        }
+    }
+    public bool GetIsMoving()
+    {
+        return isMoving;
     }
 
     public void MoveRightDirection(float _speed)
@@ -96,42 +110,22 @@ public class Monster : MonoBehaviour
         StartCoroutine(MoveRight(_speed));
     }
 
-    public void MoveLeftDirection(float _speed)
-    {
-        StartCoroutine(MoveLeft(_speed));
-    }
-
     IEnumerator MoveRight(float _speed)
     {
 
-        direction = -1f * _speed;
+        isMoving = true;
+        xDirection = -1f * _speed;
         animator.SetBool("IsAttacking", false);
 
         yield return new WaitForSeconds(0.6f);
 
-        direction = 1f * _speed;
-        animator.SetBool("IsAttacking", true);
-
-        yield return null;
-    }
-
-    IEnumerator MoveLeft(float _speed)
-    {
-
-        direction = 2f * _speed;
-        animator.SetBool("IsAttacking", false);
+        xDirection = 1f * _speed;
 
         yield return new WaitForSeconds(0.6f);
 
-        direction = 1f * _speed;
-        animator.SetBool("IsAttacking", true);
 
-        yield return null;
-    }
+        isMoving = false;
 
-    public bool GetIsMoving()
-    {
-        return isMoving;
     }
 
     public void OnDamaged(int damage)

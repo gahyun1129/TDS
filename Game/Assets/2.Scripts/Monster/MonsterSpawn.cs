@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MonsterSpawn : MonoBehaviour
 {
-    [SerializeField] float coolTime = 3f;
+    [SerializeField] float coolTime = 5f;
     [SerializeField] List<GameObject> monsterPrefeb = new List<GameObject>();
 
     private void Start()
@@ -20,7 +20,7 @@ public class MonsterSpawn : MonoBehaviour
 
             if (monsterPrefeb[_id] != null )
             {
-                GameObject _monster = Instantiate(monsterPrefeb[_id], transform.position, Quaternion.identity);
+                Instantiate(monsterPrefeb[_id], transform.position, Quaternion.identity);
             }
 
             yield return new WaitForSeconds(coolTime);

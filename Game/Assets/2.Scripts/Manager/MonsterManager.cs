@@ -9,7 +9,7 @@ public class MonsterManager : MonoBehaviour
     private static MonsterManager instance;
     public static MonsterManager GetInstance() => instance;
 
-    [SerializeField] List<List<Monster>> monsters= new List<List<Monster>>();
+    public List<List<Monster>> monsters= new List<List<Monster>>();
 
     private void Awake()
     {
@@ -20,90 +20,36 @@ public class MonsterManager : MonoBehaviour
         monsters.Add(new List<Monster>());
     }
 
-    private void Start()
+    public void ManageMonster(int _layer)
     {
-        StartCoroutine(ManageMonster());
-    }
-
-    IEnumerator ManageMonster()
-    {
-        while (true)
-        {
-            for(int i = 1; i < monsters.Count; i++)
-            {
-                if (monsters[i].Count > 0 && !monsters[i][0].GetIsMoving())
-                {
-                    MoveMonstersToLeft(i);
-                    MoveMonstersToRight(i - 1);
-
-                    Monster _monster = monsters[i][0];
-                    monsters[i].Remove(_monster);
-                    monsters[i - 1].Insert(0, _monster);
-                }
-            }
-            yield return new WaitForSeconds(0.2f);
-        }
-    }
-
-    IEnumerator JumpMonster(int _layer, Monster _monster)
-    {
-
-        while(true)
-        {
-            if ( !_monster.GetIsMoving())
-            {
-                break;
-            }
-
-            yield return null;
-        }
-
-        _monster.Jump();
-
-        yield return new WaitForSeconds(0.3f);
-
-        if ( monsters.Count - 1 < (_layer + 1) )
-        {
-            monsters.Add(new List<Monster>());
-        }
-
+        MoveMonsters(_layer);
+        Monster _monster = monsters[_layer][0];
         monsters[_layer].Remove(_monster);
-        AddMonster(_layer + 1, _monster);
-        //monsters[_layer + 1].Add(_monster);
+        monsters[_layer - 1].Insert(0, _monster);
+    }
 
-        yield return new WaitForSeconds(0.3f);
+    void MoveMonsters(int _layer)
+    {
+        for ( int i = 0; i < monsters[_layer - 1].Count; ++i)
+        {
+            monsters[_layer - 1][i].MoveRightDirection(1f);
+        }
     }
 
     public void AddMonster(int _layer, Monster _monster)
     {
+        if ( monsters.Count <= _layer)
+        {
+            monsters.Add(new List<Monster>());
+        }
+
         monsters[_layer].Add(_monster);
-
-        if (monsters[_layer].Count > 2)
-        {
-            StartCoroutine(JumpMonster(_layer, _monster));
-        }
-    }
-
-    public void MoveMonstersToRight(int _layer)
-    {
-        foreach(Monster _monster in monsters[_layer])
-        {
-            _monster.MoveRightDirection(2f);
-        }
-    }
-    public void MoveMonstersToLeft(int _layer)
-    {
-        foreach (Monster _monster in monsters[_layer])
-        {
-            _monster.MoveRightDirection(2f);
-        }
     }
 
     public bool IsMonsterInList()
     {
         return monsters[0].Count > 0;
     }
-
     public Monster GetFirstMonster()
     {
         if (monsters[0].Count > 0)
@@ -112,6 +58,7 @@ public class MonsterManager : MonoBehaviour
         }
         return null;
     }
+
 
     public void MonsterDie(Monster _monster)
     {
@@ -123,5 +70,25 @@ public class MonsterManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+
+    public bool AmILastMonsterInLayer(int _layer, Monster _monster)
+    {
+        if ( monsters.Count > _layer)
+        {
+            return monsters[_layer].Count > 1 && monsters[_layer].IndexOf(_monster) == monsters[_layer].Count - 1;
+        }
+        return false;
+    }
+
+    public bool AmIFirstMonsterInLayer(int _layer, Monster _monster)
+    {
+        return monsters.Count > _layer && _layer > 0 && monsters[_layer].IndexOf(_monster) == 0;
+    }
+
+    public void RemoveMonster(int _layer, Monster _monster)
+    {
+        monsters[_layer].Remove(_monster);
     }
 }
