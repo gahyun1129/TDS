@@ -80,7 +80,7 @@ public class Monster : MonoBehaviour
 
     public void OnAttack()
     {
-        // 꾸준히 데미지는 줌
+        // Damage To Truck
     }
 
     public void Jump()
@@ -96,10 +96,29 @@ public class Monster : MonoBehaviour
         StartCoroutine(MoveRight(_speed));
     }
 
+    public void MoveLeftDirection(float _speed)
+    {
+        StartCoroutine(MoveLeft(_speed));
+    }
+
     IEnumerator MoveRight(float _speed)
     {
 
         direction = -1f * _speed;
+        animator.SetBool("IsAttacking", false);
+
+        yield return new WaitForSeconds(0.6f);
+
+        direction = 1f * _speed;
+        animator.SetBool("IsAttacking", true);
+
+        yield return null;
+    }
+
+    IEnumerator MoveLeft(float _speed)
+    {
+
+        direction = 2f * _speed;
         animator.SetBool("IsAttacking", false);
 
         yield return new WaitForSeconds(0.6f);
@@ -117,19 +136,23 @@ public class Monster : MonoBehaviour
 
     public void OnDamaged(int damage)
     {
-        Debug.Log("맞음!");
         if (HP == 100)
         {
             slider.gameObject.SetActive(true);
         }
 
         HP -= damage;
-        
+
+        slider.value = HP / 100f;
 
         if ( HP < 0)
         {
-            // 죽음
             AttackMonster.GetInstacne().SetTargetToNull();
+            MonsterManager.GetInstance().MonsterDie(this);
+
+            animator.SetBool("IsDead", true);
+
+            Destroy(gameObject);
         }
     }
 

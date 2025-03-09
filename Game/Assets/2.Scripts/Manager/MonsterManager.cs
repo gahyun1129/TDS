@@ -33,14 +33,15 @@ public class MonsterManager : MonoBehaviour
             {
                 if (monsters[i].Count > 0 && !monsters[i][0].GetIsMoving())
                 {
-                    MoveMonsters(i - 1);
+                    MoveMonstersToLeft(i);
+                    MoveMonstersToRight(i - 1);
 
                     Monster _monster = monsters[i][0];
                     monsters[i].Remove(_monster);
                     monsters[i - 1].Insert(0, _monster);
                 }
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 
@@ -79,16 +80,22 @@ public class MonsterManager : MonoBehaviour
 
         if (monsters[_layer].Count > 2)
         {
-            Debug.Log("점프할래? " + _layer);
             StartCoroutine(JumpMonster(_layer, _monster));
         }
     }
 
-    public void MoveMonsters(int _layer)
+    public void MoveMonstersToRight(int _layer)
     {
         foreach(Monster _monster in monsters[_layer])
         {
-            _monster.MoveRightDirection(monsters.Count - _layer);
+            _monster.MoveRightDirection(2f);
+        }
+    }
+    public void MoveMonstersToLeft(int _layer)
+    {
+        foreach (Monster _monster in monsters[_layer])
+        {
+            _monster.MoveRightDirection(2f);
         }
     }
 
@@ -104,5 +111,17 @@ public class MonsterManager : MonoBehaviour
             return monsters[0][0];
         }
         return null;
+    }
+
+    public void MonsterDie(Monster _monster)
+    {
+        foreach ( List<Monster> monsters in monsters)
+        {
+            if ( monsters.Contains(_monster))
+            {
+                monsters.Remove(_monster);
+                break;
+            }
+        }
     }
 }
