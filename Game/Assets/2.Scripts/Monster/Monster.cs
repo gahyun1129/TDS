@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Monster : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class Monster : MonoBehaviour
     float direction = 1f;
     
     float jumpForce = 5f;
+
+    [SerializeField] Slider slider;
+    int HP = 100;
 
     private void Awake()
     {
@@ -109,6 +113,24 @@ public class Monster : MonoBehaviour
     public bool GetIsMoving()
     {
         return isMoving;
+    }
+
+    public void OnDamaged(int damage)
+    {
+        Debug.Log("¸ÂÀ½!");
+        if (HP == 100)
+        {
+            slider.gameObject.SetActive(true);
+        }
+
+        HP -= damage;
+        
+
+        if ( HP < 0)
+        {
+            // Á×À½
+            AttackMonster.GetInstacne().SetTargetToNull();
+        }
     }
 
 }

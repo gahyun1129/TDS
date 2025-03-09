@@ -46,6 +46,17 @@ public class MonsterManager : MonoBehaviour
 
     IEnumerator JumpMonster(int _layer, Monster _monster)
     {
+
+        while(true)
+        {
+            if ( !_monster.GetIsMoving())
+            {
+                break;
+            }
+
+            yield return null;
+        }
+
         _monster.Jump();
 
         yield return new WaitForSeconds(0.3f);
@@ -79,5 +90,19 @@ public class MonsterManager : MonoBehaviour
         {
             _monster.MoveRightDirection(monsters.Count - _layer);
         }
+    }
+
+    public bool IsMonsterInList()
+    {
+        return monsters[0].Count > 0;
+    }
+
+    public Monster GetFirstMonster()
+    {
+        if (monsters[0].Count > 0)
+        {
+            return monsters[0][0];
+        }
+        return null;
     }
 }
