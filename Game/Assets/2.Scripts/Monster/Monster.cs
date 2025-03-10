@@ -8,27 +8,24 @@ using UnityEngine.UI;
 public class Monster : MonoBehaviour
 {
     Animator animator;
-    Rigidbody2D rigidBody;
 
     Vector3 targetPosition;
 
-    bool isAttacking = false;
     bool isMoving = false;
     bool isJumping = false;
     float speed = 2f;
-    float direction = 1f;
-    
-    float jumpForce = 5f;
+    int power = 25;
 
-    int curLayer = 0;
+    int layer = 0;
 
     [SerializeField] Slider slider;
+    [SerializeField] MonsterDie MonsterDie;
+
     int HP = 100;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        rigidBody = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -57,19 +54,19 @@ public class Monster : MonoBehaviour
 
     public void OnAttack()
     {
-        // Damage To Truck
+        Truck.GetInstance().OnDamaged(power);
     }
 
     public void Jump(Vector3 _position)
     {
         SetTarget(_position);
-        curLayer++;
+        layer++;
     }
 
     public void Fall(Vector3 _position)
     {
         SetTarget(_position);
-        curLayer--;
+        layer--;
     }
 
     public bool GetIsMoving()
@@ -91,11 +88,14 @@ public class Monster : MonoBehaviour
         if ( HP < 0)
         {
             AttackMonster.GetInstacne().SetTargetToNull();
-            MonsterManager.GetInstance().MonsterDie(curLayer, this);
+            MonsterManager.GetInstance().MonsterDie(layer, this);
 
             animator.SetBool("IsDead", true);
-            Destroy(gameObject);
+
+            MonsterDie.Die();
         }
     }
+
+    public void SetLayer(int _layer) => layer = _layer;
 
 }

@@ -12,12 +12,15 @@ public class MonsterManager : MonoBehaviour
 
     [SerializeField] List<List<Monster>> monsters= new List<List<Monster>>();
     [SerializeField] Vector3 truckPosition;
+    [SerializeField] MonsterSpawn spawner;
 
     bool isJumping = false;
     Monster jumpingMonster = null;
 
     bool isRotating = false;
     Monster rotatingMonster = null;
+
+    int layer = 0;
 
     private void Awake()
     {
@@ -30,8 +33,8 @@ public class MonsterManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(JumpMonster(0));
-        StartCoroutine(RotateMonsters(1));
+        StartCoroutine(JumpMonster(layer));
+        StartCoroutine(RotateMonsters(layer + 1));
     }
 
     IEnumerator RotateMonsters(int _layer)
@@ -191,5 +194,18 @@ public class MonsterManager : MonoBehaviour
         {
             ResetTarget(i);
         }
+    }
+
+    public void MonsterWin()
+    {
+        foreach(List<Monster> monsters in monsters)
+        {
+            foreach(Monster _monster in monsters)
+            {
+                _monster.SetTarget(new Vector3(-20f, truckPosition.y, 0));
+                Destroy(_monster.gameObject, 2f);
+            }
+        }
+        spawner.SetMonsterWin(true);
     }
 }

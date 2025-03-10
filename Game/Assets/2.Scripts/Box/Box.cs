@@ -1,13 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Box : MonoBehaviour
 {
-    float HP = 1f;
+    [SerializeField] Slider slider;
+    [SerializeField] int maxHP = 1000;
 
-    public void OnDamaged(float _damage)
+    int HP = 1000;
+
+    bool isBroken = false;
+
+    private void Start()
     {
-        HP -= _damage;
+        HP = maxHP; 
     }
+
+    public void OnDamaged(int _damage)
+    {
+
+        if (HP == maxHP)
+        {
+            slider.gameObject.SetActive(true);
+        }
+
+        HP -= _damage;
+        slider.value = HP / (float)maxHP;
+
+        if (HP <= 0)
+        {
+            isBroken = true;
+        }
+    }
+
+    public bool IsBroken() => isBroken;
 }
