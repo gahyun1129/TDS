@@ -39,7 +39,7 @@ public class Monster : MonoBehaviour
             if ( transform.position == targetPosition )
             {
                 isMoving = false;
-                // animator.SetBool("IsAttacking", true);
+                animator.SetBool("IsAttacking", true);
             }
         }
     }
@@ -50,6 +50,7 @@ public class Monster : MonoBehaviour
 
     public void SetTarget(Vector3 _position)
     {
+        animator.SetBool("IsAttacking", false);
         isMoving = true;
         targetPosition = _position;
     }
