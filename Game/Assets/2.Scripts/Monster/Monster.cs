@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,12 +10,17 @@ public class Monster : MonoBehaviour
     Animator animator;
     Rigidbody2D rigidBody;
 
+    Vector3 targetPosition;
+
     bool isAttacking = false;
-    bool isMoving = true;
+    bool isMoving = false;
+    bool isJumping = false;
     float speed = 2f;
     float direction = 1f;
     
     float jumpForce = 5f;
+
+    int curLayer = 0;
 
     [SerializeField] Slider slider;
     int HP = 100;
@@ -27,55 +33,25 @@ public class Monster : MonoBehaviour
 
     private void Update()
     {
-        if (isMoving)
+        if (isMoving && transform.position != targetPosition)
         {
-            transform.position += direction * Vector3.left * speed * Time.deltaTime;
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if ( collision.collider.CompareTag("Truck") || collision.collider.CompareTag("Zombie"))
-        {
-            isMoving = true;
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if ( !isAttacking )
-        {
-            if (collision.collider.CompareTag("Zombie") || collision.collider.CompareTag("Truck"))
+            transform.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+            if ( transform.position == targetPosition )
             {
                 isMoving = false;
-
-                isAttacking = true;
-                animator.SetBool("IsAttacking", true);
-
-                MonsterManager.GetInstance().AddMonster(0, this);
+                // animator.SetBool("IsAttacking", true);
             }
         }
-        else
-        {
-            if (collision.collider.CompareTag("Truck"))
-            {
-                if (isMoving)
-                {
-                    isMoving = false;
-                }
+    }
 
-                animator.SetBool("IsAttacking", true);
-            }
-            else if (collision.collider.CompareTag("Zombie") && Mathf.Abs(transform.position.y - collision.transform.position.y) < 0.3f)
-            {
-                if (isMoving)
-                {
-                    isMoving = false;
-                }
+    public void SetIsJumping(bool _value) => isJumping = _value;
+    public bool GetIsJumping() => isJumping;
 
-                animator.SetBool("IsAttacking", true);
-            }
-        }
+
+    public void SetTarget(Vector3 _position)
+    {
+        isMoving = true;
+        targetPosition = _position;
     }
 
     public void OnAttack()
@@ -83,50 +59,16 @@ public class Monster : MonoBehaviour
         // Damage To Truck
     }
 
-    public void Jump()
+    public void Jump(Vector3 _position)
     {
-        rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
-
-        isMoving = true;
-
+        SetTarget(_position);
+        curLayer++;
     }
 
-    public void MoveRightDirection(float _speed)
+    public void Fall(Vector3 _position)
     {
-        StartCoroutine(MoveRight(_speed));
-    }
-
-    public void MoveLeftDirection(float _speed)
-    {
-        StartCoroutine(MoveLeft(_speed));
-    }
-
-    IEnumerator MoveRight(float _speed)
-    {
-
-        direction = -1f * _speed;
-        animator.SetBool("IsAttacking", false);
-
-        yield return new WaitForSeconds(0.6f);
-
-        direction = 1f * _speed;
-        animator.SetBool("IsAttacking", true);
-
-        yield return null;
-    }
-
-    IEnumerator MoveLeft(float _speed)
-    {
-
-        direction = 2f * _speed;
-        animator.SetBool("IsAttacking", false);
-
-        yield return new WaitForSeconds(0.6f);
-
-        direction = 1f * _speed;
-        animator.SetBool("IsAttacking", true);
-
-        yield return null;
+        SetTarget(_position);
+        curLayer--;
     }
 
     public bool GetIsMoving()
@@ -148,10 +90,9 @@ public class Monster : MonoBehaviour
         if ( HP < 0)
         {
             AttackMonster.GetInstacne().SetTargetToNull();
-            MonsterManager.GetInstance().MonsterDie(this);
+            MonsterManager.GetInstance().MonsterDie(curLayer, this);
 
             animator.SetBool("IsDead", true);
-
             Destroy(gameObject);
         }
     }

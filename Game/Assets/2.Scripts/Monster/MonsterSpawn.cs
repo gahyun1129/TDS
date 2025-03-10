@@ -18,11 +18,12 @@ public class MonsterSpawn : MonoBehaviour
         {
             int _id = Random.Range(0, monsterPrefeb.Count);
 
-            if (monsterPrefeb[_id] != null )
+            if (monsterPrefeb[_id] != null)
             {
                 GameObject _monster = Instantiate(monsterPrefeb[_id], transform.position, Quaternion.identity);
-            }
 
+                MonsterManager.GetInstance().AddMonster(0, _monster.GetComponent<Monster>());
+            }
             yield return new WaitForSeconds(coolTime);
         }
     }

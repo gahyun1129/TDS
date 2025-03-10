@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class MonsterManager : MonoBehaviour
 {
@@ -10,6 +11,13 @@ public class MonsterManager : MonoBehaviour
     public static MonsterManager GetInstance() => instance;
 
     [SerializeField] List<List<Monster>> monsters= new List<List<Monster>>();
+    [SerializeField] Vector3 truckPosition;
+
+    bool isJumping = false;
+    Monster jumpingMonster = null;
+
+    bool isRotating = false;
+    Monster rotatingMonster = null;
 
     private void Awake()
     {
@@ -22,81 +30,136 @@ public class MonsterManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(ManageMonster());
+        StartCoroutine(JumpMonster(0));
+        StartCoroutine(RotateMonsters(1));
     }
 
-    IEnumerator ManageMonster()
+    IEnumerator RotateMonsters(int _layer)
     {
         while (true)
         {
-            for(int i = 1; i < monsters.Count; i++)
+            if (!isRotating && monsters.Count > _layer && monsters[_layer].Count > 0)
             {
-                if (monsters[i].Count > 0 && !monsters[i][0].GetIsMoving())
+                if ( rotatingMonster == null)
                 {
-                    MoveMonstersToLeft(i);
-                    MoveMonstersToRight(i - 1);
+                    rotatingMonster = monsters[_layer][0];
+                }
+                if ( rotatingMonster != null && !rotatingMonster.GetIsMoving())
+                {
+                    RemoveMonster(_layer, rotatingMonster);
 
-                    Monster _monster = monsters[i][0];
-                    monsters[i].Remove(_monster);
-                    monsters[i - 1].Insert(0, _monster);
+                    rotatingMonster.Fall(new Vector3(truckPosition.x, truckPosition.y + (_layer - 1) * 1.2f, 0));
+
+                    isRotating = true;
+                    
+                    AddMonsterAtFirst(_layer - 1, rotatingMonster);
+                    
+                    ResetTarget(_layer - 1);
                 }
             }
-            yield return new WaitForSeconds(0.2f);
+            else
+            {
+                if ( rotatingMonster != null && !rotatingMonster.GetIsMoving())
+                {
+                    isRotating = false;
+                    rotatingMonster = null;
+
+                    ResetTarget(_layer);
+
+                    yield return new WaitForSeconds(1f);
+                }
+                if ( rotatingMonster == null)
+                {
+                    isRotating = false;
+                    rotatingMonster = null;
+
+                    if ( monsters.Count > _layer)
+                    {
+                        ResetTarget(_layer);
+                    }
+
+                    yield return new WaitForSeconds(1f);
+                }
+            }
+            yield return null;
         }
     }
 
-    IEnumerator JumpMonster(int _layer, Monster _monster)
+    public void ResetTarget(int _layer)
     {
-
-        while(true)
+        for (int i = 0; i < monsters[_layer].Count; ++i)
         {
-            if ( !_monster.GetIsMoving())
+            if (monsters[_layer][i] != rotatingMonster && monsters[_layer][i] != jumpingMonster)
             {
-                break;
+                monsters[_layer][i].SetTarget(new Vector3(truckPosition.x + i * 1.1f, truckPosition.y + (_layer) * 1.2f, 0));
+            }
+        }
+    }
+
+    IEnumerator JumpMonster(int _layer)
+    {
+        while (true)
+        {
+            if (!isJumping && monsters[_layer].Count > 1)
+            {
+                if (jumpingMonster == null)
+                {
+                    for( int i = 1; i < monsters[_layer].Count; ++i )
+                    {
+                        if (!monsters[_layer][i].GetIsMoving() && i + 4 >= monsters[_layer].Count)
+                        {
+                            jumpingMonster = monsters[_layer][i];
+                        }
+                    }
+                }
+                if (jumpingMonster != null && !jumpingMonster.GetIsMoving())
+                {
+                    RemoveMonster(_layer, jumpingMonster);
+                    jumpingMonster.Jump(new Vector3(jumpingMonster.transform.position.x, truckPosition.y + (_layer + 1) * 1.2f, 0));
+
+                    isJumping = true;
+                }
+            }
+            else
+            {
+                if (jumpingMonster != null && !jumpingMonster.GetIsMoving())
+                {
+                    AddMonster(_layer + 1, jumpingMonster);
+
+                    ResetTarget(_layer + 1);
+                    isJumping = false;
+                    jumpingMonster = null;
+
+                    yield return new WaitForSeconds(2f);
+                }
             }
 
             yield return null;
         }
-
-        _monster.Jump();
-
-        yield return new WaitForSeconds(0.3f);
-
-        if ( monsters.Count - 1 < (_layer + 1) )
-        {
-            monsters.Add(new List<Monster>());
-        }
-
-        monsters[_layer].Remove(_monster);
-        AddMonster(_layer + 1, _monster);
-        //monsters[_layer + 1].Add(_monster);
-
-        yield return new WaitForSeconds(0.3f);
     }
 
     public void AddMonster(int _layer, Monster _monster)
     {
+        if ( monsters.Count - 1 < _layer )
+        {
+            monsters.Add(new List<Monster>());
+        }
+
+        _monster.SetTarget(new Vector3(truckPosition.x + monsters[_layer].Count * 1.1f, truckPosition.y + _layer * 1.2f, 0));
         monsters[_layer].Add(_monster);
-
-        if (monsters[_layer].Count > 2)
-        {
-            StartCoroutine(JumpMonster(_layer, _monster));
-        }
     }
 
-    public void MoveMonstersToRight(int _layer)
+    public void AddMonsterAtFirst(int _layer, Monster _monster)
     {
-        foreach(Monster _monster in monsters[_layer])
-        {
-            _monster.MoveRightDirection(2f);
-        }
+        _monster.SetTarget(new Vector3(truckPosition.x, truckPosition.y + _layer * 1.2f, 0));
+        monsters[_layer].Insert(0, _monster);
     }
-    public void MoveMonstersToLeft(int _layer)
+
+    public void RemoveMonster(int _layer, Monster _monster)
     {
-        foreach (Monster _monster in monsters[_layer])
-        {
-            _monster.MoveRightDirection(2f);
-        }
+        monsters[_layer].Remove(_monster);
+
+        ResetTarget(_layer);
     }
 
     public bool IsMonsterInList()
@@ -113,15 +176,20 @@ public class MonsterManager : MonoBehaviour
         return null;
     }
 
-    public void MonsterDie(Monster _monster)
+    public void MonsterDie(int _layer, Monster _monster)
     {
-        foreach ( List<Monster> monsters in monsters)
+
+        foreach(List<Monster> monsters in monsters)
         {
-            if ( monsters.Contains(_monster))
+            if (monsters.Contains(_monster))
             {
                 monsters.Remove(_monster);
-                break;
             }
+        }
+
+        for (int i = 0; i < monsters.Count; ++i)
+        {
+            ResetTarget(i);
         }
     }
 }

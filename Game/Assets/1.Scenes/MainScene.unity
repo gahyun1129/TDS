@@ -1255,6 +1255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de288bc2a16490c4db6721ac6f8f2739, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  truckPosition: {x: 0, y: -3.22, z: 0}
 --- !u!4 &1603764445
 Transform:
   m_ObjectHideFlags: 0
