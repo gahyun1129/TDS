@@ -3689,6 +3689,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentToReturnTo: {fileID: 0}
   rune: {fileID: 0}
+  runeSlot: {fileID: 409783817}
 --- !u!225 &409783820
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -12495,6 +12496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentToReturnTo: {fileID: 0}
   rune: {fileID: 0}
+  runeSlot: {fileID: 1428437821}
 --- !u!225 &1428437824
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -14478,6 +14480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentToReturnTo: {fileID: 0}
   rune: {fileID: 0}
+  runeSlot: {fileID: 1667017219}
 --- !u!225 &1667017222
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -14938,6 +14941,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentToReturnTo: {fileID: 0}
   rune: {fileID: 0}
+  runeSlot: {fileID: 1694233854}
 --- !u!225 &1694233857
 CanvasGroup:
   m_ObjectHideFlags: 0

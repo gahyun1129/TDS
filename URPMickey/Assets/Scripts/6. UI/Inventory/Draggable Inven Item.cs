@@ -15,6 +15,8 @@ public class DraggableInvenItem : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     public RuneData rune;
 
+    public Image runeSlot;
+
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();

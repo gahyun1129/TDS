@@ -1,10 +1,13 @@
 using UnityEngine;
-using UnityEngine.EventSystems; // 이벤트 시스템 사용을 위해 필수
+using UnityEngine.EventSystems;
+using UnityEngine.UI; // 이벤트 시스템 사용을 위해 필수
 
 public class RuneSlotUI : MonoBehaviour, IDropHandler
 {
-
+    [Header("룬 슬롯 정보")]
     public SkillData skill;
+    [SerializeField] private Image runeIcon;
+    [SerializeField] private RuneData equippedRune;
 
     // 이 슬롯에 아이템이 드롭되었을 때 호출됨
     public void OnDrop(PointerEventData eventData)
@@ -23,9 +26,11 @@ public class RuneSlotUI : MonoBehaviour, IDropHandler
             // "자기 자신(이 슬롯의 transform)"으로 설정
             // 이렇게 하면 DraggableItem의 OnEndDrag가 실행될 때,
             // 이 슬롯을 부모로 삼게 됨
-            item.parentToReturnTo = this.transform;
-
             skill.EuippedRune(item.rune);
+            equippedRune = item.rune;
+            runeIcon.sprite = equippedRune.icon;
+            item.runeSlot = null;
+            item.rune = null;
         }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI; // UI 관련 클래스를 사용하기 위해 추가
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class DraggableItem : MonoBehaviour
