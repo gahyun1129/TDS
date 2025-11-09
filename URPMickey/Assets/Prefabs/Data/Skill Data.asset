@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b1a81aebcd68148be45ef4a34b32cc, type: 3}
+  m_Name: Skill Data
+  m_EditorClassIdentifier: 
+  baseSkill:
+  - {fileID: 11400000, guid: 90273f47131563b4b94060502ad42e87, type: 2}
+  - {fileID: 11400000, guid: 738e651f1ba194e46bba8e2b51107c04, type: 2}
+  - {fileID: 11400000, guid: ce42b561d0f82ed4eaddc8e4fbcb8526, type: 2}
+  - {fileID: 11400000, guid: 450d60bacb7a6644a966607e69a72f96, type: 2}
+  - {fileID: 11400000, guid: 84f8954387bebee4398424714f4a6b32, type: 2}
+  runes:
+  - {fileID: 11400000, guid: 5102a45cabcc01a46bffca6f586557c3, type: 2}

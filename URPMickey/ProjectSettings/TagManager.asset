@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - back
+  - Enemy
+  - UI_Canvas_Target
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - player
+  - Water
+  - UI
+  - background
+  - wreck
+  - Enemy
+  - Dragging
+  - Player
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: UI
+    uniqueID: 3605044411
+    locked: 0
+  - name: Dragging
+    uniqueID: 2192326081
+    locked: 0
+  - name: Enemy
+    uniqueID: 3719221973
+    locked: 0
+  - name: Player
+    uniqueID: 2360903103
+    locked: 0
+  - name: Skill
+    uniqueID: 2221583225
+    locked: 0
