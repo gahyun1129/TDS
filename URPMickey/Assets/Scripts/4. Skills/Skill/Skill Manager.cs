@@ -29,7 +29,8 @@ public class SkillManager : MonoBehaviour
     
         foreach (var skill in equippedSkills)
         {
-            skillCooldowns[skill] = 0f; 
+            skillCooldowns[skill] = 0f;
+            skill.UpdateSkillInfo(null);
         }
     }
 

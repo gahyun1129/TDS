@@ -23,7 +23,7 @@ public class SkillData : ScriptableObject
     public Sprite finalIcon;
 
     [Header("룬")]
-    public List<RuneData> runes;
+    public List<RuneData> equippedRunes;
 
     [Header("발동 조건")]
     public List<SkillRequirement> requirements;
@@ -62,9 +62,9 @@ public class SkillData : ScriptableObject
 
         List<SkillEffect> effectsToRun = new List<SkillEffect>(effects);
 
-        if (runes.Count > 0)
+        if (equippedRunes.Count > 0)
         {
-            foreach (var rune in runes)
+            foreach (var rune in equippedRunes)
             {
                 if (rune.overrideProjectilePrefab != null)
                 {
@@ -74,16 +74,7 @@ public class SkillData : ScriptableObject
                 {
                     effectsToRun.Insert(0, rune.additionalEffect);
                 }
-                finalSkillName = rune.skillName;
-                findalDescription = rune.description;
-                finalIcon = rune.icon;
             }
-        }
-        else
-        {
-            finalSkillName = skillName;
-            findalDescription = description;
-            finalIcon = icon;
         }
 
         foreach (var effect in effectsToRun)
@@ -95,15 +86,36 @@ public class SkillData : ScriptableObject
     public void EuippedRune(RuneData rune)
     {
         Debug.Log("룬 장착");
-        runes.Add(rune);
-        finalSkillName = rune.skillName;
-        findalDescription = rune.description;
-        finalIcon = rune.icon;
+        equippedRunes.Add(rune);
+        UpdateSkillInfo(rune);
+    }
+
+    public void UnequippedRune(RuneData rune)
+    {
+        equippedRunes.Remove(rune);
+        UpdateSkillInfo(null);
     }
 
     public void ResetRune()
     {
-        runes.Clear();
+        equippedRunes.Clear();
+        UpdateSkillInfo(null);
+    }
+
+    public void UpdateSkillInfo(RuneData rune)
+    {
+        if ( rune != null)
+        {
+            finalSkillName = rune.skillName;
+            findalDescription = rune.description;
+            finalIcon = rune.icon;
+        }
+        else
+        {
+            finalSkillName = skillName;
+            findalDescription = description;
+            finalIcon = icon;
+        }
     }
     
 }
