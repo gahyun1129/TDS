@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/00 Scenes/Title.unity
+    guid: 192371f3fe3e4414a8d4608dbb925d45
+  - enabled: 1
+    path: Assets/00 Scenes/Loading Scene.unity
+    guid: 0e5768eb83aa95c479946b2f4fb6f0f5
+  - enabled: 1
+    path: Assets/00 Scenes/InGame.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 0
+    path: Assets/MOST_HapticFeedback/Scenes/HapticFeedback.unity
+    guid: 6b93461b729e04225aadc79a9cb5b687
+  m_configObjects: {}
